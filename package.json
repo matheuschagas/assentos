@@ -5,6 +5,9 @@
   "repository": "https://github.com/matheuschagas/assentos.git",
   "author": "matheuschagas <matheus.chagas@acad.pucrs.br>",
   "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "express": "^4.16.4",
     "socket.io": "^2.2.0"
