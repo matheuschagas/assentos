@@ -6,7 +6,8 @@
   "author": "matheuschagas <matheus.chagas@acad.pucrs.br>",
   "license": "MIT",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "worker": "node worker.js"
   },
   "dependencies": {
     "express": "^4.16.4",
