@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- saved from url=(0022)http://localhost:3003/ -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
+
     <title>Assentos</title>
     <style type="text/css">
         .seat{
@@ -11,7 +11,7 @@
             background: #4234aa;
             text-align: center;
             margin: 10px;
-            display: table-cell;
+            display: inline-flex;
         }
 
         .seat:hover{
@@ -35,9 +35,15 @@
     </style>
 </head>
 <body>
+<div id="actions">
+    <div>
+        <button onclick="resetDatabase()">Reset Database</button>
+    </div>
+</div>
 <div id="assentos"></div>
 <script type="text/javascript">
     var socket = null;
+    var myID = null;
     var ID = function () {
         // Math.random should be unique because of its seeding algorithm.
         // Convert it to base 36 (numbers + letters), and grab the first 9 characters
@@ -47,13 +53,35 @@
     function select(seat) {
         if(seat.className.indexOf('seat-unavailable')<0) {
             if(seat.className.indexOf('seat-selected')>-1){
-                socket.emit('send', {seat: seat.id, action: 'deselect'});
+                socket.emit('send', {seat: seat.id, action: 'deselectSeat'});
                 seat.className = 'seat';
             }else{
-                socket.emit('send', {seat: seat.id, action: 'select'});
+                socket.emit('send', {seat: seat.id, id: myID, action: 'selectSeat'});
                 seat.className = 'seat seat-selected';
             }
         }
+    }
+
+    function resetDatabase() {
+        console.log('reseting database');
+        socket.emit('send', {action: 'clearDatabase'});
+    }
+
+
+    function clearDatabase() {
+        var seatsUnavailable = document.getElementsByClassName('seat-unavailable');
+        for(var i = 0; i < seatsUnavailable.length; i++){
+            deselectSeat(seatsUnavailable[i].id);
+        }
+        var seatsSelected = document.getElementsByClassName('seat-selected');
+        for(var j = 0; j < seatsSelected.length; j++){
+            deselectSeat(seatsSelected[i].id);
+        }
+    }
+
+    function deselectSeat(seat){
+        let seatNode = document.getElementById(seat);
+        seatNode.className = 'seat';
     }
 
     function populate(number){
@@ -70,24 +98,44 @@
     }
 
     window.onload = function() {
-        var dev = false;
+        var dev = true;
         var urlSocket = 'https://assentos.herokuapp.com';
-        socket = io(dev?'http://localhost':urlSocket);
-        socket.emit("join", ID());
+        socket = io(dev?'http://localhost:3003':urlSocket);
+        myID = ID();
+        socket.emit("join", myID);
         socket.on('update', function(data){
             console.log(data);
+            if(data.type==='message'){
+                console.log(data.message);
+            }else if(data.type==='init'){
+                for(let key in data.booked){
+                    var seat = document.getElementById(key);
+                    seat.className = 'seat seat-unavailable';
+                }
+            }
         });
         socket.on('seatUpdate', function (origin, data) {
             console.log(data);
-            if(data.action === 'select'){
-                var seat = document.getElementById(data.seat);
-                seat.className = 'seat seat-unavailable';
-            }else if(data.action === 'deselect'){
-                var seat = document.getElementById(data.seat);
-                seat.className = 'seat';
+            switch (data.action) {
+                case 'selectSeat':
+                    var seat = document.getElementById(data.seat);
+                    seat.className = 'seat seat-unavailable';
+                    break;
+                case 'deselectSeat':
+                    deselectSeat(data.seat);
+                    break;
             }
         });
-        populate(20);
+        socket.on('clearDatabase', function (origin, data) {
+            console.log(data);
+            switch (data.action) {
+                case 'clearDatabase':
+                    clearDatabase();
+                    break;
+            }
+        });
+
+        populate(100);
     };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" type="text/javascript"></script>
