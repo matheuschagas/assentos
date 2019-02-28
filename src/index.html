@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!-- saved from url=(0022)http://localhost:3003/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Assentos</title>
+    <style type="text/css">
+        .seat{
+            width: 30px;
+            height: 30px;
+            border-radius: 15px;
+            background: #4234aa;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .seat:hover{
+            cursor: pointer;
+        }
+
+        .seat-unavailable{
+            background: #757575;
+        }
+
+        .seat-unavailable:hover{
+            cursor: default;
+        }
+
+        .seat-selected::after{
+            content: "✔";
+            color: #ffffff;
+            position: relative;
+            top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="seat" id="assento1" onclick="select(this)"></div>
+<div class="seat" id="assento2" onclick="select(this)"></div>
+<script type="text/javascript">
+    var socket = null;
+    var ID = function () {
+        // Math.random should be unique because of its seeding algorithm.
+        // Convert it to base 36 (numbers + letters), and grab the first 9 characters
+        // after the decimal.
+        return '_' + Math.random().toString(36).substr(2, 9);
+    };
+    function select(seat) {
+        if(seat.className.indexOf('seat-unavailable')<0) {
+            if(seat.className.indexOf('seat-selected')>-1){
+                socket.emit('send', {seat: seat.id, action: 'deselect'});
+                seat.className = 'seat';
+            }else{
+                socket.emit('send', {seat: seat.id, action: 'select'});
+                seat.className = 'seat seat-selected';
+            }
+        }
+    }
+    window.onload = function() {
+        var dev = true;
+        var urlSocket = 'https://assentos.herokuapp.com';
+        socket = io((dev?'http://localhost':urlSocket)+':3003');
+        socket.emit("join", ID());
+        socket.on('update', function(data){
+            console.log(data);
+        });
+        socket.on('seatUpdate', function (origin, data) {
+            console.log(data);
+            if(data.action === 'select'){
+                var seat = document.getElementById(data.seat);
+                seat.className = 'seat seat-unavailable';
+            }else if(data.action === 'deselect'){
+                var seat = document.getElementById(data.seat);
+                seat.className = 'seat';
+            }
+        })
+    };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" type="text/javascript"></script>
+
+</body></html>

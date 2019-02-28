@@ -1,0 +1,12 @@
+{
+  "name": "assentos",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/matheuschagas/assentos.git",
+  "author": "matheuschagas <matheus.chagas@acad.pucrs.br>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.4",
+    "socket.io": "^2.2.0"
+  }
+}
