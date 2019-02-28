@@ -58,7 +58,7 @@
     window.onload = function() {
         var dev = true;
         var urlSocket = 'https://assentos.herokuapp.com';
-        socket = io((dev?'http://localhost':urlSocket)+':3003');
+        socket = io((dev?'http://localhost':urlSocket));
         socket.emit("join", ID());
         socket.on('update', function(data){
             console.log(data);

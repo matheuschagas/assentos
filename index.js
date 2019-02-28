@@ -11,7 +11,7 @@ app.get('/', function(req, res){
 
 //SocketIO vem aqui
 
-http.listen(3003, function(){
+http.listen(process.env.PORT || 3003, function(){
     console.log('listening on port 3003');
 });
 
