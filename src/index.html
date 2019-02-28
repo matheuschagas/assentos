@@ -56,9 +56,9 @@
         }
     }
     window.onload = function() {
-        var dev = true;
+        var dev = false;
         var urlSocket = 'https://assentos.herokuapp.com';
-        socket = io((dev?'http://localhost':urlSocket));
+        socket = io(dev?'http://localhost':urlSocket);
         socket.emit("join", ID());
         socket.on('update', function(data){
             console.log(data);
