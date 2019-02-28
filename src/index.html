@@ -98,7 +98,7 @@
     }
 
     window.onload = function() {
-        var dev = true;
+        var dev = false;
         var urlSocket = 'https://assentos.herokuapp.com';
         socket = io(dev?'http://localhost:3003':urlSocket);
         myID = ID();
@@ -134,7 +134,6 @@
                     break;
             }
         });
-
         populate(100);
     };
 </script>
