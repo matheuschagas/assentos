@@ -70,10 +70,12 @@
 
     function clearDatabase() {
         var seatsUnavailable = document.getElementsByClassName('seat-unavailable');
+        seatsUnavailable = [...seatsUnavailable];
         for(var i = 0; i < seatsUnavailable.length; i++){
             deselectSeat(seatsUnavailable[i].id);
         }
         var seatsSelected = document.getElementsByClassName('seat-selected');
+        seatsSelected = [...seatsSelected];
         for(var j = 0; j < seatsSelected.length; j++){
             deselectSeat(seatsSelected[i].id);
         }
