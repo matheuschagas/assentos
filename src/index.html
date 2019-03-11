@@ -57,7 +57,6 @@
                 seat.className = 'seat';
             }else{
                 socket.emit('send', {seat: seat.id, id: myID, action: 'selectSeat'});
-                seat.className = 'seat seat-selected';
             }
         }
     }
@@ -115,6 +114,10 @@
                     seat.className = 'seat seat-unavailable';
                 }
             }
+        });
+        socket.on('seatBooked', function (origin, data){
+            var seat = document.getElementById(data.seat);
+            seat.className = 'seat seat-selected';
         });
         socket.on('seatUpdate', function (origin, data) {
             console.log(data);

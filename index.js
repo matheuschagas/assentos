@@ -25,8 +25,12 @@ function populateDatabase() {
 };
 
 function bookSeat(msg){
+    let success = false;
     try{
-        booked[msg.seat] = msg;
+        if(booked[msg.seat] === undefined){
+            booked[msg.seat] = msg;
+            success = true;
+        }
        /* //region create key value table
         let sql = "INSERT INTO keyvalue(key, value) VALUES ('map', " + JSON.stringify(booked) + ")";
 
@@ -38,7 +42,7 @@ function bookSeat(msg){
     }catch(e){
         console.log(e);
     }
-
+    return success;
 }
 
 function unbookSeat(msg){
@@ -102,8 +106,10 @@ io.on("connection", function (client) {
                 client.broadcast.emit("seatUpdate", clients[client.id], msg);
                 break;
             case "selectSeat":
-                bookSeat(msg);
-                client.broadcast.emit("seatUpdate", clients[client.id], msg);
+                if(bookSeat(msg)){
+                    client.emit("seatBooked", clients[client.id], msg);
+                    client.broadcast.emit("seatUpdate", clients[client.id], msg);
+                }
                 break;
             case "clearDatabase":
                 resetDatabase();
